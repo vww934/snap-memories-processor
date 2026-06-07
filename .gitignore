@@ -1,0 +1,6 @@
+*.env
+
+json/
+html/
+memories/
+index.html
