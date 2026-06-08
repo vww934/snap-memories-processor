@@ -5,6 +5,8 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
+
+	"github.com/EliasLd/snap-memories-processor/internal/archive"
 )
 
 type Config struct {
@@ -25,9 +27,20 @@ var processCmd = &cobra.Command{
 	Short: "Process Snapchat exports",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
+		archives, err := archive.Discover(cfg.InputDir)
+		if err != nil {
+			return err
+		}
+
 		fmt.Printf("Input:   %s\n", cfg.InputDir)
 		fmt.Printf("Output:  %s\n", cfg.OutputDir)
-		fmt.Printf("Workers: %d\n", cfg.Workers)
+		fmt.Printf("Workers: %d\n\n", cfg.Workers)
+
+		fmt.Printf("Found %d archive(s)\n\n", len(archives))
+
+		for _, archive := range archives {
+			fmt.Printf("- %s\n", archive.Name)
+		}
 
 		return nil
 	},
