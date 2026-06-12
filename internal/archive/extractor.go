@@ -37,6 +37,17 @@ func Extract(
 
 		target := filepath.Join(destDir, file.Name)
 
+		// Avoid Zip Slip
+		if !strings.HasPrefix(
+			target,
+			filepath.Clean(destDir)+string(os.PathSeparator),
+		) {
+			return model.Extraction{}, fmt.Errorf(
+				"illegal file path: %s",
+				file.Name,
+			)
+		}
+
 		if file.FileInfo().IsDir() {
 			if err := os.MkdirAll(target, 0755); err != nil {
 				return model.Extraction{}, err
