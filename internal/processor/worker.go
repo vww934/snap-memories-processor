@@ -10,6 +10,7 @@ func ProcessAll(
 	medias []model.Media,
 	outputDir string,
 	workers int,
+	progress chan<- model.Progress,
 ) []model.ProcessResult {
 
 	jobs := make(
@@ -60,13 +61,24 @@ func ProcessAll(
 		len(medias),
 	)
 
+	processed := 0
+
 	for result := range results {
 
 		processResults = append(
 			processResults,
 			result,
 		)
+
+		processed++
+
+		progress <- model.Progress{
+			Processed: processed,
+			Total:     len(medias),
+		}
 	}
+
+	close(progress)
 
 	return processResults
 }
