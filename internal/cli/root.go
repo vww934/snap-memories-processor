@@ -24,8 +24,8 @@ type Config struct {
 var cfg Config
 
 var rootCmd = &cobra.Command{
-	Use:   "snapmemories",
-	Short: "Snapchat memories exporter",
+	Use:   "smp",
+	Short: "Snapchat memories processor",
 }
 
 var processCmd = &cobra.Command{
