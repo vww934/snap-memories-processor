@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snap Memories Processor</title>
+  <meta name="description" content="Guide interactif pour traiter vos souvenirs Snapchat exportés avec snap-memories-processor." />
+  <style>
+    :root {
+      --yellow: #FFFC00;
+      --dark:   #0f0f0f;
+      --dark-2: #1a1a1a;
+      --dark-3: #262626;
+      --text:   #e8e8e8;
+      --text-muted: #888;
+      --success: #4ade80;
+      --danger:  #f87171;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font-display: 'Helvetica Neue','Arial Black',sans-serif;
+      --font-body: 'Inter','Segoe UI',system-ui,sans-serif;
+      --mono: 'Fira Code','Consolas',monospace;
+      --transition: 180ms ease;
+      /* couleurs des encadrés en mode sombre */
+      --ci-bg:#0e1a30; --ci-border:#1a3a60; --ci-text:#7ab8f5;
+      --cw-bg:#1e1500; --cw-border:#4a3500; --cw-text:#ffc94a;
+      --ct-bg:#0a2010; --ct-border:#1a4020; --ct-text:#6ee7a0;
+      /* blocs de code */
+      --code-bg:#0a0a0a; --code-border:#2a2a2a; --code-text:#cdd6f4;
+      --code-hdr:#1e1e1e;
+    }
+    /* surcharge des variables pour le mode jour */
+    body.light {
+      --dark:   #f5f5f5;
+      --dark-2: #ffffff;
+      --dark-3: #e0e0e0;
+      --text:   #111111;
+      --text-muted: #555555;
+      --ci-bg:#dbeafe; --ci-border:#93c5fd; --ci-text:#1d4ed8;
+      --cw-bg:#fef9c3; --cw-border:#fde047; --cw-text:#92400e;
+      --ct-bg:#dcfce7; --ct-border:#86efac; --ct-text:#166534;
+      --code-bg:#1e1e2e; --code-border:#3a3a5c; --code-text:#cdd6f4;
+      --code-hdr:#2a2a40;
+    }
+    body.light header h1 { color: #111; }
+    body.light .section-header h2 { color: #111; }
+    body.light .step-content h3 { color: #111; }
+    body.light .builder-card h3 { color: #111; }
+    body.light .dl-card h3 { color: #111; }
+    body.light details.faq summary { color: #111; }
+    body.light .tab-btn { color: var(--text-muted); }
+    body.light .tab-btn:hover { color: var(--text); }
+    body.light .tab-btn[aria-selected="true"] { color: #b09000; border-bottom-color: #b09000; }
+    body.light header h1 span { color: #b09000; }
+    body.light .step-num { background: #b09000; }
+    body.light .copy-btn { border-color: #bbb; color: #555; }
+    body.light .copy-btn:hover { border-color: #888; color: #111; }
+    body.light .os-btn { background: #eee; border-color: #ccc; color: #444; }
+    body.light .os-btn.active { background: #b09000; color: #fff; border-color: #b09000; }
+    body.light .field input[type="text"],
+    body.light .field input[type="number"] { background:#eee; border-color:#ccc; color:#111; }
+    body.light .toggle-field { background:#eee; border-color:#ccc; }
+    body.light .cmd-result { background:#1e1e2e; border-color:#b09000; color:#b09000; }
+    body.light .btn.secondary { border-color:#888; color:#111; }
+    body.light footer a { color: #b09000; }
+    body.light .faq-body a { color: #b09000; }
+    body.light .badge { background:#e0e0e0; border-color:#ccc; color:#555; }
+    body.light .badge.green { background:#dcfce7; border-color:#86efac; color:#166534; }
+    body.light .ctrl-btn { border-color:#ccc; color:#555; background:#eee; }
+    body.light .ctrl-btn:hover { border-color:#888; color:#111; }
+
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--dark);
+      color:var(--text);
+      font-family:var(--font-body);
+      font-size:16px;
+      line-height:1.6;
+      min-height:100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* lien d'évitement pour l'accessibilité clavier */
+    .skip-link {
+      position:absolute; top:-100%; left:1rem;
+      background:var(--yellow); color:#111;
+      padding:.5rem 1rem; border-radius:var(--radius-sm);
+      font-weight:700; z-index:9999;
+      transition:top var(--transition); text-decoration:none;
+    }
+    .skip-link:focus { top:1rem; }
+
+    /* en-tête : titre, description, badges et boutons de contrôle */
+    header {
+      background:var(--dark-2);
+      border-bottom:1px solid var(--dark-3);
+      padding:2rem 1.5rem 2rem;
+      text-align:center;
+      position:relative;
+    }
+    .header-controls {
+      position:absolute; top:1rem; right:1rem;
+      display:flex; gap:.5rem; align-items:center;
+    }
+    .ctrl-btn {
+      background:transparent;
+      border:1px solid #444;
+      color:var(--text-muted);
+      cursor:pointer;
+      border-radius:var(--radius-sm);
+      font-family:var(--font-body);
+      font-size:.8rem;
+      font-weight:600;
+      padding:.35rem .75rem;
+      transition:all var(--transition);
+      white-space:nowrap;
+    }
+    .ctrl-btn:hover { border-color:#777; color:var(--text); }
+    .ctrl-btn:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; }
+
+    header h1 {
+      font-family:var(--font-display);
+      font-size:clamp(2rem,6vw,3.5rem);
+      font-weight:900; letter-spacing:-.03em;
+      line-height:1.05; color:#fff; margin-bottom:.75rem;
+    }
+    header h1 span { color:var(--yellow); }
+    .hero-sub {
+      color:var(--text-muted); font-size:1.05rem;
+      max-width:540px; margin:0 auto 2rem;
+    }
+    .hero-badges {
+      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
+    }
+    .badge {
+      background:var(--dark-3); border:1px solid #333;
+      color:var(--text-muted); font-size:.78rem;
+      padding:.3rem .75rem; border-radius:100px;
+      font-family:var(--mono);
+    }
+    .badge.green { color:var(--success); border-color:#1a3a25; background:#0d2218; }
+
+    /* barre de navigation à onglets, collante en haut de page */
+    nav[aria-label="Sections de la page"] {
+      background:var(--dark-2); border-bottom:1px solid var(--dark-3);
+      position:sticky; top:0; z-index:100;
+    }
+    .tab-list {
+      display:flex; overflow-x:auto; scrollbar-width:none;
+      max-width:900px; margin:0 auto; padding:0 1rem;
+      gap:0; list-style:none;
+    }
+    .tab-list::-webkit-scrollbar { display:none; }
+    .tab-btn {
+      background:transparent; border:none;
+      border-bottom:3px solid transparent;
+      color:var(--text-muted); cursor:pointer;
+      font-family:var(--font-body); font-size:.88rem; font-weight:500;
+      padding:1rem 1.2rem; white-space:nowrap;
+      transition:color var(--transition),border-color var(--transition);
+    }
+    .tab-btn:hover { color:var(--text); }
+    .tab-btn[aria-selected="true"] { color:var(--yellow); border-bottom-color:var(--yellow); }
+    .tab-btn:focus-visible { outline:2px solid var(--yellow); outline-offset:-2px; }
+
+    /* contenu principal et gestion des panneaux actifs/inactifs */
+    main { max-width:900px; margin:0 auto; padding:2.5rem 1.5rem 4rem; }
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    .section-header {
+      margin-bottom:2rem; padding-bottom:1rem;
+      border-bottom:1px solid var(--dark-3);
+    }
+    .section-header h2 {
+      font-family:var(--font-display);
+      font-size:clamp(1.4rem,3vw,2rem);
+      font-weight:900; letter-spacing:-.02em; color:#fff;
+    }
+    .section-header p { color:var(--text-muted); margin-top:.4rem; font-size:.95rem; }
+
+    /* étapes numérotées du guide */
+    .steps { display:flex; flex-direction:column; gap:1.5rem; }
+    .step {
+      background:var(--dark-2); border:1px solid var(--dark-3);
+      border-radius:var(--radius); padding:1.5rem;
+      display:grid; grid-template-columns:3rem 1fr;
+      gap:1rem; align-items:start;
+      transition:border-color var(--transition);
+    }
+    .step:hover { border-color:#3a3a3a; }
+    .step-num {
+      background:var(--yellow); color:#111;
+      font-family:var(--font-display); font-weight:900; font-size:1.1rem;
+      width:2.5rem; height:2.5rem; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .step-content h3 { font-weight:700; font-size:1rem; color:#fff; margin-bottom:.4rem; }
+    .step-content p, .step-content li { color:var(--text-muted); font-size:.9rem; }
+    .step-content ul { padding-left:1.2rem; margin-top:.4rem; }
+    .step-content ul li { margin-bottom:.2rem; }
+
+    /* encadrés d'information, d'avertissement et d'astuce */
+    .callout {
+      border-radius:var(--radius-sm); padding:1rem 1.2rem;
+      font-size:.88rem; margin-top:.75rem;
+      display:flex; gap:.6rem; align-items:flex-start;
+    }
+    .callout.info { background:var(--ci-bg); border:1px solid var(--ci-border); color:var(--ci-text); }
+    .callout.warning { background:var(--cw-bg); border:1px solid var(--cw-border); color:var(--cw-text); }
+    .callout.tip { background:var(--ct-bg); border:1px solid var(--ct-border); color:var(--ct-text); }
+    .callout-icon { flex-shrink:0; font-size:1rem; margin-top:.05rem; }
+
+    /* blocs de code avec en-tête et bouton copier */
+    .code-block {
+      background:var(--code-bg); border:1px solid var(--code-border);
+      border-radius:var(--radius-sm); margin:.75rem 0; position:relative;
+    }
+    .code-block-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.5rem 1rem; border-bottom:1px solid var(--code-hdr);
+      font-family:var(--mono); font-size:.75rem; color:var(--text-muted);
+    }
+    .code-block pre {
+      padding:1rem; overflow-x:auto;
+      font-family:var(--mono); font-size:.875rem;
+      line-height:1.6; color:var(--code-text); white-space:pre;
+    }
+    .copy-btn {
+      background:transparent; border:1px solid #333;
+      color:var(--text-muted); cursor:pointer;
+      padding:.25rem .6rem; border-radius:4px;
+      font-size:.75rem; font-family:var(--font-body);
+      transition:all var(--transition);
+      display:flex; align-items:center; gap:.3rem;
+    }
+    .copy-btn:hover { border-color:#555; color:var(--text); }
+    .copy-btn:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; }
+    .copy-btn.copied { color:var(--success); border-color:var(--success); }
+
+    /* onglets de sélection du système d'exploitation */
+    .os-tabs { margin:1rem 0; }
+    .os-tab-list { display:flex; gap:.4rem; margin-bottom:.75rem; list-style:none; }
+    .os-btn {
+      background:var(--dark-3); border:1px solid #333;
+      color:var(--text-muted); cursor:pointer;
+      padding:.35rem .9rem; border-radius:6px;
+      font-size:.82rem; font-family:var(--font-body);
+      transition:all var(--transition);
+    }
+    .os-btn:hover { border-color:#555; color:var(--text); }
+    .os-btn.active { background:var(--yellow); color:#111; border-color:var(--yellow); font-weight:600; }
+    .os-btn:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; }
+    .os-content { display:none; }
+    .os-content.active { display:block; }
+
+    /* cartes et formulaire du générateur de commande */
+    .builder-card {
+      background:var(--dark-2); border:1px solid var(--dark-3);
+      border-radius:var(--radius); padding:1.5rem; margin-bottom:1.5rem;
+    }
+    .builder-card h3 { font-weight:700; color:#fff; margin-bottom:.3rem; }
+    .builder-card > p { color:var(--text-muted); font-size:.88rem; margin-bottom:1.5rem; }
+    .field-group { display:flex; flex-direction:column; gap:1rem; }
+    .field { display:flex; flex-direction:column; gap:.4rem; }
+    .field label { font-size:.85rem; font-weight:600; color:var(--text); }
+    .field label .required { color:var(--yellow); margin-left:.2rem; }
+    .field input[type="text"], .field input[type="number"] {
+      background:var(--dark-3); border:1px solid #333;
+      border-radius:var(--radius-sm); color:var(--text);
+      font-family:var(--mono); font-size:.88rem;
+      padding:.55rem .9rem; width:100%;
+      transition:border-color var(--transition);
+    }
+    .field input:focus { outline:none; border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,252,0,.12); }
+    .field input::placeholder { color:#555; }
+    .field-hint { font-size:.78rem; color:var(--text-muted); }
+    .toggle-field {
+      display:flex; align-items:center; gap:.75rem;
+      padding:.75rem 1rem; background:var(--dark-3);
+      border:1px solid #333; border-radius:var(--radius-sm);
+      cursor:pointer; transition:border-color var(--transition);
+    }
+    .toggle-field:hover { border-color:#555; }
+    .toggle-field:focus-within { border-color:var(--yellow); box-shadow:0 0 0 3px rgba(255,252,0,.12); }
+    .toggle-field input[type="checkbox"] { width:1.1rem; height:1.1rem; accent-color:var(--yellow); cursor:pointer; flex-shrink:0; }
+    .toggle-label { display:flex; flex-direction:column; }
+    .toggle-label strong { font-size:.88rem; color:var(--text); }
+    .toggle-label span { font-size:.78rem; color:var(--text-muted); }
+    .cmd-output { margin-top:1.5rem; }
+    .cmd-output-label { font-size:.8rem; color:var(--text-muted); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em; }
+    .cmd-result {
+      background:#0a0a0a; border:1px solid var(--yellow);
+      border-radius:var(--radius-sm); padding:1rem 1.2rem;
+      font-family:var(--mono); font-size:.9rem; color:var(--yellow);
+      word-break:break-all; display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    }
+    .cmd-result span { flex:1; }
+
+    /* cartes de téléchargement par système d'exploitation */
+    .dl-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin:1.5rem 0; }
+    .dl-card {
+      background:var(--dark-2); border:1px solid var(--dark-3);
+      border-radius:var(--radius); padding:1.25rem; text-align:center;
+      transition:border-color var(--transition),transform var(--transition);
+    }
+    .dl-card:hover { border-color:#555; transform:translateY(-2px); }
+    .dl-card .os-emoji { font-size:2rem; margin-bottom:.75rem; display:block; }
+    .dl-card h3 { font-size:.95rem; font-weight:700; color:#fff; margin-bottom:.3rem; }
+    .dl-card p { font-size:.8rem; color:var(--text-muted); margin-bottom:.75rem; }
+    .dl-card .dl-links { display:flex; flex-direction:column; gap:.4rem; align-items:center; }
+
+    .btn {
+      display:inline-flex; align-items:center; gap:.4rem;
+      background:var(--yellow); border:none;
+      border-radius:var(--radius-sm); color:#111;
+      cursor:pointer; font-family:var(--font-body);
+      font-size:.82rem; font-weight:700;
+      padding:.5rem 1rem; text-decoration:none;
+      transition:opacity var(--transition),transform var(--transition);
+    }
+    .btn:hover { opacity:.85; }
+    .btn:active { transform:scale(.98); }
+    .btn:focus-visible { outline:3px solid #fff; outline-offset:2px; }
+    .btn.secondary {
+      background:transparent; border:1px solid #444; color:var(--text);
+    }
+    .btn.secondary:hover { border-color:#666; }
+    .btn.sm { font-size:.78rem; padding:.35rem .8rem; }
+
+    /* RELEASES LINK */
+    .releases-link {
+      text-align:center; margin-top:1rem;
+      font-size:.85rem; color:var(--text-muted);
+    }
+    .releases-link a { color:var(--yellow); text-decoration:underline; text-decoration-thickness:1px; }
+    .releases-link a:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; border-radius:2px; }
+
+    /* accordéon FAQ */
+    .faq-list { display:flex; flex-direction:column; gap:.5rem; }
+    details.faq {
+      background:var(--dark-2); border:1px solid var(--dark-3);
+      border-radius:var(--radius-sm); transition:border-color var(--transition);
+    }
+    details.faq[open] { border-color:#3a3a3a; }
+    details.faq:focus-within { border-color:var(--yellow); }
+    details.faq summary {
+      cursor:pointer; display:flex; align-items:center;
+      justify-content:space-between; gap:1rem;
+      font-weight:600; font-size:.92rem; color:var(--text);
+      padding:1rem 1.2rem; list-style:none; user-select:none;
+    }
+    details.faq summary::-webkit-details-marker { display:none; }
+    details.faq summary:focus-visible { outline:2px solid var(--yellow); outline-offset:-2px; border-radius:var(--radius-sm); }
+    .faq-chevron { flex-shrink:0; transition:transform var(--transition); }
+    details.faq[open] .faq-chevron { transform:rotate(180deg); }
+    .faq-body { padding:0 1.2rem 1rem; font-size:.88rem; color:var(--text-muted); line-height:1.7; }
+    .faq-body a { color:var(--yellow); text-decoration:underline; text-decoration-thickness:1px; }
+    .faq-body a:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; border-radius:2px; }
+
+    /* pied de page */
+    footer { border-top:1px solid var(--dark-3); padding:2rem 1.5rem; text-align:center; font-size:.82rem; color:var(--text-muted); }
+    footer a { color:var(--yellow); text-decoration:none; }
+    footer a:hover { text-decoration:underline; }
+    footer a:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; border-radius:2px; }
+
+    /* adaptation mobile */
+    @media (max-width:600px) {
+      .step { grid-template-columns:1fr; }
+      .step-num { width:2rem; height:2rem; font-size:.9rem; }
+      .header-controls { position:static; justify-content:center; margin-bottom:1rem; }
+    }
+    /* désactivation des animations si l'utilisateur le préfère */
+      *, *::before, *::after { transition:none !important; animation:none !important; }
+      html { scroll-behavior:auto; }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link" data-i18n="skip">Aller au contenu principal</a>
+
+<header>
+  <div class="header-controls">
+    <button class="ctrl-btn" id="lang-btn" onclick="toggleLang()" aria-label="Switch to English">🌐 EN</button>
+    <button class="ctrl-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Passer en mode jour">☀️ Jour</button>
+  </div>
+  <h1 data-i18n="h1">Snap Memories<br><span>Processor</span></h1>
+  <p class="hero-sub" data-i18n="hero-sub">Récupérez vos souvenirs Snapchat exportés avec leurs overlays, horodatages et localisations — en quelques commandes.</p>
+  <div class="hero-badges" aria-label="Informations sur le projet">
+    <span class="badge">v1.0.0</span>
+    <span class="badge">Windows · macOS · Linux</span>
+    <span class="badge green">✓ Open source · MIT</span>
+  </div>
+</header>
+
+<nav aria-label="Sections de la page">
+  <ul class="tab-list" role="tablist">
+    <li role="none"><button class="tab-btn" role="tab" aria-selected="true" aria-controls="panel-guide" id="tab-guide" onclick="switchTab('guide')">📖 <span data-i18n="tab-guide">Guide</span></button></li>
+    <li role="none"><button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-install" id="tab-install" onclick="switchTab('install')">⬇️ <span data-i18n="tab-install">Installation</span></button></li>
+    <li role="none"><button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-builder" id="tab-builder" onclick="switchTab('builder')">🛠️ <span data-i18n="tab-builder">Commande</span></button></li>
+    <li role="none"><button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-faq" id="tab-faq" onclick="switchTab('faq')">❓ FAQ</button></li>
+  </ul>
+</nav>
+
+<main id="main-content">
+
+  <!-- ===== PANNEAU : GUIDE ===== -->
+  <section class="panel active" id="panel-guide" role="tabpanel" aria-labelledby="tab-guide">
+    <div class="section-header">
+      <h2 data-i18n="guide-title">Comment ça fonctionne ?</h2>
+      <p data-i18n="guide-sub">Suivez ces étapes pour récupérer vos souvenirs Snapchat complets.</p>
+    </div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">1</div>
+        <div class="step-content">
+          <h3 data-i18n="s1-title">Exporter vos données depuis Snapchat</h3>
+          <p data-i18n="s1-p1">Connectez-vous à votre compte Snapchat (téléphone ou PC) et rendez-vous sur la page <strong>Mes données</strong> :</p>
+          <div style="margin:.75rem 0;">
+            <a href="https://accounts.snapchat.com/accounts/downloadmydata" target="_blank" rel="noopener noreferrer" class="btn" aria-label="Ouvrir la page Mes données Snapchat (nouvel onglet)">
+              🔗 <span data-i18n="s1-snaplink">Ouvrir « Mes données » sur Snapchat</span>
+            </a>
+          </div>
+          <p data-i18n="s1-p2">Puis allez dans <strong>Paramètres → Mes données</strong> et cochez ces deux cases :</p>
+          <ul>
+            <li><strong data-i18n="s1-li1">Exporter mes Souvenirs</strong></li>
+            <li><strong data-i18n="s1-li2">Exporter des fichiers JSON</strong></li>
+          </ul>
+          <div class="callout warning">
+            <span class="callout-icon" aria-hidden="true">⚠️</span>
+            <span data-i18n="s1-warn">Les fichiers JSON sont indispensables pour restaurer les métadonnées. Sans eux, l'outil ne peut pas fonctionner.</span>
+          </div>
+          <p style="margin-top:.75rem;" data-i18n="s1-p3">Choisissez la plage de dates souhaitée, puis patientez. Snapchat vous enverra un e-mail quand l'export sera prêt.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">2</div>
+        <div class="step-content">
+          <h3 data-i18n="s2-title">Télécharger les archives ZIP</h3>
+          <p data-i18n="s2-p1">Sur la même page <strong>Mes données</strong>, dépliez la section <em>« Vos exports »</em>. Vous verrez plusieurs archives ZIP.</p>
+          <div class="callout info">
+            <span class="callout-icon" aria-hidden="true">ℹ️</span>
+            <span data-i18n="s2-info">Téléchargez <strong>toutes</strong> les archives ZIP, pas seulement la première. Elles peuvent être réparties si vous avez beaucoup de souvenirs.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">3</div>
+        <div class="step-content">
+          <h3 data-i18n="s3-title">Organiser les fichiers</h3>
+          <p data-i18n="s3-p1">Placez tous les fichiers ZIP dans un même dossier. Les archives peuvent porter n'importe quel nom et se trouver n'importe où sur votre système.</p>
+          <div class="code-block" aria-label="Exemple de structure de dossier">
+            <div class="code-block-header"><span data-i18n="s3-eg">Exemple de structure</span></div>
+            <pre>exports/
+├── mydata.zip
+├── mydata-2.zip
+├── mydata-3.zip
+└── mydata-4.zip</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">4</div>
+        <div class="step-content">
+          <h3 data-i18n="s4-title">Vérifier les prérequis</h3>
+          <p data-i18n="s4-p1">Avant de lancer le traitement, assurez-vous que FFmpeg est bien installé :</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span data-i18n="s4-verify">Vérification</span>
+              <button class="copy-btn" onclick="copyCode(this,'ffmpeg -version')" aria-label="Copier la commande de vérification FFmpeg"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button>
+            </div>
+            <pre>ffmpeg -version</pre>
+          </div>
+          <p style="margin-top:.6rem;" data-i18n="s4-p2">Sur macOS et Linux, rendez aussi l'exécutable <code>smp</code> exécutable :</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span>macOS / Linux</span>
+              <button class="copy-btn" onclick="copyCode(this,'chmod +x smp')" aria-label="Copier chmod +x"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button>
+            </div>
+            <pre>chmod +x smp</pre>
+          </div>
+          <div class="callout tip">
+            <span class="callout-icon" aria-hidden="true">💡</span>
+            <span data-i18n="s4-tip">Sur Windows, aucune étape supplémentaire n'est nécessaire : double-cliquez sur le <code>.exe</code> ou lancez-le depuis un terminal.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">5</div>
+        <div class="step-content">
+          <h3 data-i18n="s5-title">Lancer le traitement</h3>
+          <p data-i18n="s5-p1">Ouvrez un terminal dans le dossier contenant l'exécutable <code>smp</code>, puis lancez :</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span>Terminal</span>
+              <button class="copy-btn" onclick="copyCode(this,'smp process -i ./exports')" aria-label="Copier la commande de base"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button>
+            </div>
+            <pre>smp process -i ./exports</pre>
+          </div>
+          <p style="margin-top:.5rem;" data-i18n="s5-p2">Sur macOS/Linux, si <code>smp</code> n'est pas dans le PATH :</p>
+          <div class="code-block">
+            <div class="code-block-header">
+              <span>macOS / Linux</span>
+              <button class="copy-btn" onclick="copyCode(this,'./smp process -i ./exports')" aria-label="Copier la commande avec ./"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button>
+            </div>
+            <pre>./smp process -i ./exports</pre>
+          </div>
+          <p style="margin-top:.5rem;" data-i18n="s5-p3">Une barre de progression s'affiche. Patientez jusqu'à la fin.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num" aria-hidden="true">6</div>
+        <div class="step-content">
+          <h3 data-i18n="s6-title">Récupérer les fichiers traités</h3>
+          <p data-i18n="s6-p1">Les médias sont enregistrés dans le dossier <code>output/</code> créé automatiquement à côté de l'exécutable.</p>
+          <div class="code-block" aria-label="Exemple de résultat terminal">
+            <div class="code-block-header"><span data-i18n="s6-result">Résultat attendu</span></div>
+            <pre><span style="color:#89b4fa">Total media  :</span> <span style="color:#a6e3a1">2502</span>
+<span style="color:#89b4fa">Videos       :</span> <span style="color:#a6e3a1">1898</span>
+<span style="color:#89b4fa">Images       :</span> <span style="color:#a6e3a1">604</span>
+<span style="color:#89b4fa">With overlay :</span> <span style="color:#a6e3a1">435</span>
+
+<span style="color:#89b4fa">Processed    :</span> <span style="color:#a6e3a1">2502</span>
+<span style="color:#89b4fa">Failed       :</span> <span style="color:#f38ba8">0</span>
+
+<span style="color:#cba6f7">Completed in 42.7s</span></pre>
+          </div>
+          <div class="code-block" aria-label="Exemple de fichiers de sortie">
+            <div class="code-block-header"><span data-i18n="s6-output">Fichiers générés</span></div>
+            <pre>output/
+├── 2020-07-24_094EC87A-main.jpg
+├── 2020-07-24_42180C76-main.mp4
+└── ...</pre>
+          </div>
+          <div class="callout info">
+            <span class="callout-icon" aria-hidden="true">ℹ️</span>
+            <span data-i18n="s6-info">En cas d'erreurs, un fichier <code>output/errors.log</code> est généré automatiquement avec les détails de chaque échec.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== PANNEAU : INSTALLATION ===== -->
+  <section class="panel" id="panel-install" role="tabpanel" aria-labelledby="tab-install">
+    <div class="section-header">
+      <h2 data-i18n="install-title">Installation</h2>
+      <p data-i18n="install-sub">Téléchargez l'exécutable et installez les dépendances requises.</p>
+    </div>
+
+    <div class="dl-cards">
+      <div class="dl-card">
+        <span class="os-emoji" aria-hidden="true">🪟</span>
+        <h3>Windows</h3>
+        <p data-i18n="win-desc">Windows 10/11 — 64 bits (x64)</p>
+        <div class="dl-links">
+          <a href="" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Télécharger smp pour Windows x64">
+            ↓ smp-windows-amd64.exe
+          </a>
+        </div>
+      </div>
+      <div class="dl-card">
+        <span class="os-emoji" aria-hidden="true">🍎</span>
+        <h3>macOS</h3>
+        <div class="dl-links">
+          <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.25rem;">Apple Silicon (M1/M2/M3)</p>
+          <a href="" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Télécharger smp pour macOS Apple Silicon">
+            ↓ smp-darwin-arm64
+          </a>
+          <p style="font-size:.78rem;color:var(--text-muted);margin:.5rem 0 .25rem;">Intel (x64)</p>
+          <a href="" class="btn secondary sm" target="_blank" rel="noopener noreferrer" aria-label="Télécharger smp pour macOS Intel">
+            ↓ smp-darwin-amd64
+          </a>
+        </div>
+      </div>
+      <div class="dl-card">
+        <span class="os-emoji" aria-hidden="true">🐧</span>
+        <h3>Linux</h3>
+        <div class="dl-links">
+          <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.25rem;">x86-64 (amd64)</p>
+          <a href="" class="btn" target="_blank" rel="noopener noreferrer" aria-label="Télécharger smp pour Linux x64">
+            ↓ smp-linux-amd64
+          </a>
+          <p style="font-size:.78rem;color:var(--text-muted);margin:.5rem 0 .25rem;">ARM 64 bits</p>
+          <a href="" class="btn secondary sm" target="_blank" rel="noopener noreferrer" aria-label="Télécharger smp pour Linux ARM64">
+            ↓ smp-linux-arm64
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <p class="releases-link">
+      <span data-i18n="all-releases">Voir toutes les releases (autres architectures) →</span>
+      <a href="https://github.com/EliasLd/snap-memories-processor/releases" target="_blank" rel="noopener noreferrer">github.com/EliasLd/snap-memories-processor/releases</a>
+    </p>
+
+    <div class="callout info" style="margin:1.5rem 0;">
+      <span class="callout-icon" aria-hidden="true">ℹ️</span>
+      <span data-i18n="no-install">Aucune installation requise : placez l'exécutable où vous voulez et lancez-le depuis un terminal.</span>
+    </div>
+
+    <!-- Installation de FFmpeg (requis) -->
+    <div class="builder-card">
+      <h3>1. FFmpeg <span style="color:var(--danger);font-size:.8rem;font-weight:400;" data-i18n="required">Requis</span></h3>
+      <p data-i18n="ffmpeg-desc">Nécessaire pour traiter les vidéos et les overlays. Sans FFmpeg, l'outil ne peut pas fonctionner.</p>
+
+      <div class="os-tabs" role="region" aria-label="Instructions FFmpeg par OS">
+        <ul class="os-tab-list" role="tablist">
+          <li role="none"><button class="os-btn active" role="tab" aria-selected="true" aria-controls="ffmpeg-win" id="ffmpeg-tab-win" onclick="switchOS('ffmpeg','win',this)">Windows</button></li>
+          <li role="none"><button class="os-btn" role="tab" aria-selected="false" aria-controls="ffmpeg-mac" id="ffmpeg-tab-mac" onclick="switchOS('ffmpeg','mac',this)">macOS</button></li>
+          <li role="none"><button class="os-btn" role="tab" aria-selected="false" aria-controls="ffmpeg-linux" id="ffmpeg-tab-linux" onclick="switchOS('ffmpeg','linux',this)">Linux</button></li>
+        </ul>
+        <div id="ffmpeg-win" class="os-content active" role="tabpanel" aria-labelledby="ffmpeg-tab-win">
+          <div class="code-block">
+            <div class="code-block-header"><span>PowerShell</span><button class="copy-btn" onclick="copyCode(this,'winget install ffmpeg')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>winget install ffmpeg</pre>
+          </div>
+          <div class="callout warning"><span class="callout-icon" aria-hidden="true">⚠️</span><span data-i18n="winget-warn">Si <code>winget</code> n'est pas reconnu, installez <strong>App Installer</strong> depuis le Microsoft Store.</span></div>
+        </div>
+        <div id="ffmpeg-mac" class="os-content" role="tabpanel" aria-labelledby="ffmpeg-tab-mac">
+          <div class="code-block">
+            <div class="code-block-header"><span>Terminal</span><button class="copy-btn" onclick="copyCode(this,'brew install ffmpeg')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>brew install ffmpeg</pre>
+          </div>
+        </div>
+        <div id="ffmpeg-linux" class="os-content" role="tabpanel" aria-labelledby="ffmpeg-tab-linux">
+          <div class="code-block">
+            <div class="code-block-header"><span>Ubuntu / Debian</span><button class="copy-btn" onclick="copyCode(this,'sudo apt install ffmpeg')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>sudo apt install ffmpeg</pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Arch Linux</span><button class="copy-btn" onclick="copyCode(this,'sudo pacman -S ffmpeg')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>sudo pacman -S ffmpeg</pre>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:.85rem;color:var(--text-muted);margin-top:.75rem;" data-i18n="verify-install">Vérifiez l'installation :</p>
+      <div class="code-block">
+        <div class="code-block-header"><span data-i18n="verification">Vérification</span><button class="copy-btn" onclick="copyCode(this,'ffmpeg -version')" aria-label="Copier ffmpeg -version"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+        <pre>ffmpeg -version</pre>
+      </div>
+    </div>
+
+    <!-- Installation d'ExifTool (optionnel, pour le GPS) -->
+    <div class="builder-card">
+      <h3>2. ExifTool <span style="color:var(--text-muted);font-size:.8rem;font-weight:400;" data-i18n="optional">Optionnel — GPS</span></h3>
+      <p data-i18n="exif-desc">Nécessaire uniquement pour conserver les données GPS dans vos médias (flag <code>--gps</code>).</p>
+
+      <div class="os-tabs" role="region" aria-label="Instructions ExifTool par OS">
+        <ul class="os-tab-list" role="tablist">
+          <li role="none"><button class="os-btn active" role="tab" aria-selected="true" aria-controls="exif-win" id="exif-tab-win" onclick="switchOS('exif','win',this)">Windows</button></li>
+          <li role="none"><button class="os-btn" role="tab" aria-selected="false" aria-controls="exif-mac" id="exif-tab-mac" onclick="switchOS('exif','mac',this)">macOS</button></li>
+          <li role="none"><button class="os-btn" role="tab" aria-selected="false" aria-controls="exif-linux" id="exif-tab-linux" onclick="switchOS('exif','linux',this)">Linux</button></li>
+        </ul>
+        <div id="exif-win" class="os-content active" role="tabpanel" aria-labelledby="exif-tab-win">
+          <div class="code-block">
+            <div class="code-block-header"><span>PowerShell</span><button class="copy-btn" onclick="copyCode(this,'winget install -e --id OliverBetz.ExifTool')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>winget install -e --id OliverBetz.ExifTool</pre>
+          </div>
+        </div>
+        <div id="exif-mac" class="os-content" role="tabpanel" aria-labelledby="exif-tab-mac">
+          <div class="code-block">
+            <div class="code-block-header"><span>Terminal</span><button class="copy-btn" onclick="copyCode(this,'brew install exiftool')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>brew install exiftool</pre>
+          </div>
+        </div>
+        <div id="exif-linux" class="os-content" role="tabpanel" aria-labelledby="exif-tab-linux">
+          <div class="code-block">
+            <div class="code-block-header"><span>Ubuntu / Debian</span><button class="copy-btn" onclick="copyCode(this,'sudo apt install libimage-exiftool-perl')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>sudo apt install libimage-exiftool-perl</pre>
+          </div>
+          <div class="code-block">
+            <div class="code-block-header"><span>Arch Linux</span><button class="copy-btn" onclick="copyCode(this,'sudo pacman -S perl-image-exiftool')" aria-label="Copier"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+            <pre>sudo pacman -S perl-image-exiftool</pre>
+          </div>
+        </div>
+      </div>
+      <div class="code-block" style="margin-top:.75rem;">
+        <div class="code-block-header"><span data-i18n="verification">Vérification</span><button class="copy-btn" onclick="copyCode(this,'exiftool -ver')" aria-label="Copier exiftool -ver"><span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span></button></div>
+        <pre>exiftool -ver</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PANNEAU : GÉNÉRATEUR DE COMMANDE ===== -->
+  <section class="panel" id="panel-builder" role="tabpanel" aria-labelledby="tab-builder">
+    <div class="section-header">
+      <h2 data-i18n="builder-title">Générateur de commande</h2>
+      <p data-i18n="builder-sub">Configurez les options et copiez la commande prête à l'emploi.</p>
+    </div>
+
+    <div class="builder-card">
+      <h3 data-i18n="options">Options</h3>
+      <p data-i18n="builder-desc">Remplissez les champs pour personnaliser votre commande.</p>
+      <div class="field-group">
+        <div class="field">
+          <label for="input-dir" data-i18n="input-label">Dossier des archives ZIP <span class="required" aria-label="champ requis">*</span></label>
+          <input type="text" id="input-dir" placeholder="./exports" value="./exports" oninput="buildCommand()" aria-describedby="input-dir-hint" />
+          <p class="field-hint" id="input-dir-hint" data-i18n="input-hint">Chemin vers le dossier contenant vos fichiers .zip Snapchat.</p>
+        </div>
+        <div class="field">
+          <label for="workers" data-i18n="workers-label">Nombre de workers parallèles (<code>-w</code>)</label>
+          <input type="number" id="workers" placeholder="Défaut (recommandé)" min="1" max="32" oninput="buildCommand()" aria-describedby="workers-hint" />
+          <p class="field-hint" id="workers-hint" data-i18n="workers-hint">Contrôle combien de fichiers sont traités simultanément. Laissez vide pour la valeur par défaut.</p>
+        </div>
+        <div>
+          <label style="display:block;font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:.5rem;" data-i18n="extra-options">Options supplémentaires</label>
+          <label class="toggle-field">
+            <input type="checkbox" id="opt-gps" onchange="buildCommand()" aria-describedby="gps-hint" />
+            <span class="toggle-label">
+              <strong data-i18n="gps-label">Conserver les données GPS</strong>
+              <span id="gps-hint" data-i18n="gps-hint">Ajoute le flag <code>--gps</code>. Nécessite ExifTool installé.</span>
+            </span>
+          </label>
+        </div>
+      </div>
+      <div class="cmd-output">
+        <p class="cmd-output-label" aria-live="polite" data-i18n="generated-cmd">Commande générée</p>
+        <div class="cmd-result" role="region" aria-label="Commande générée">
+          <span id="cmd-display">smp process -i ./exports</span>
+          <button class="copy-btn" onclick="copyBuiltCommand()" id="copy-built-btn" aria-label="Copier la commande générée">
+            <span aria-hidden="true">📋</span> <span data-i18n="copy">Copier</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-card">
+      <h3 data-i18n="ref-title">Référence complète</h3>
+      <p data-i18n="ref-desc">Toutes les options disponibles pour <code>smp process</code>.</p>
+      <div class="code-block">
+        <div class="code-block-header"><span data-i18n="options">Options</span></div>
+        <pre><span style="color:#89b4fa">-i, --input</span>   <span style="color:#cdd6f4" data-i18n="ref-i">Dossier contenant les archives ZIP</span>  <span style="color:#f38ba8">(requis)</span>
+<span style="color:#89b4fa">-w, --workers</span> <span style="color:#cdd6f4" data-i18n="ref-w">Nombre de workers parallèles</span>       <span style="color:#a6e3a1">(optionnel)</span>
+<span style="color:#89b4fa">    --gps</span>     <span style="color:#cdd6f4" data-i18n="ref-gps">Écrire les coordonnées GPS</span>         <span style="color:#a6e3a1">(optionnel, ExifTool requis)</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PANNEAU : FAQ ===== -->
+  <section class="panel" id="panel-faq" role="tabpanel" aria-labelledby="tab-faq">
+    <div class="section-header">
+      <h2 data-i18n="faq-title">Questions fréquentes</h2>
+      <p data-i18n="faq-sub">Les réponses aux problèmes les plus courants.</p>
+    </div>
+    <div class="faq-list">
+
+      <details class="faq">
+        <summary><span data-i18n="faq1-q">Pourquoi dois-je cocher « Exporter les fichiers JSON » ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq1-a">Les fichiers JSON contiennent les métadonnées de chaque souvenir : date, heure, localisation GPS et informations sur l'overlay. Sans ces fichiers, l'outil n'a aucun moyen de savoir quels overlays appliquer ni comment horodater vos médias.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq2-q">Le traitement est-il lent ? Comment l'accélérer ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq2-a">La durée dépend du nombre de médias et de votre machine. Augmentez le nombre de workers avec <code>-w</code> (ex : <code>-w 8</code>) pour traiter plus de fichiers en parallèle. La valeur par défaut est généralement suffisante.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq3-q">Que se passe-t-il si certains fichiers échouent ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq3-a">Un fichier <code>output/errors.log</code> est créé automatiquement avec les détails de chaque échec. Les fichiers traités avec succès sont disponibles normalement dans <code>output/</code>.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq4-q">Mes données restent-elles privées ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq4-a">Oui. L'outil fonctionne entièrement en local sur votre machine. Aucune donnée n'est envoyée vers des serveurs distants. Vos souvenirs ne quittent jamais votre ordinateur.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq5-q">J'ai l'erreur « smp : command not found » — que faire ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq5-a">Lancez le terminal dans le dossier où se trouve l'exécutable <code>smp</code>. Sous Linux/macOS, rendez-le exécutable avec <code>chmod +x smp</code> puis appelez-le avec <code>./smp process -i ./exports</code>.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq6-q">Le flag --gps est activé mais les coordonnées n'apparaissent pas</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body" data-i18n="faq6-a">Vérifiez qu'ExifTool est installé avec <code>exiftool -ver</code>. Notez aussi que tous les souvenirs ne contiennent pas de données GPS — seuls ceux enregistrés avec la localisation active en auront.</div>
+      </details>
+
+      <details class="faq">
+        <summary><span data-i18n="faq7-q">Puis-je contribuer au projet ?</span><svg class="faq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="faq-body">
+          <span data-i18n="faq7-a">Absolument ! Le projet est open source sous licence MIT. Forkez le dépôt et ouvrez une Pull Request sur</span>
+          <a href="https://github.com/EliasLd/snap-memories-processor" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        </div>
+      </details>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>
+    <a href="https://github.com/EliasLd/snap-memories-processor" target="_blank" rel="noopener noreferrer">snap-memories-processor</a>
+    · v1.0.0 · Licence MIT · EliasLd
+  </p>
+</footer>
+
+<script>
+  /* dictionnaire de traductions FR / EN */
+  const LANG = {
+    fr: {
+      skip:'Aller au contenu principal',
+      'h1':'Snap Memories<br><span>Processor</span>',
+      'hero-sub':'Récupérez vos souvenirs Snapchat exportés avec leurs overlays, horodatages et localisations — en quelques commandes.',
+      'tab-guide':'Guide','tab-install':'Installation','tab-builder':'Commande',
+      'guide-title':'Comment ça fonctionne ?','guide-sub':'Suivez ces étapes pour récupérer vos souvenirs Snapchat complets.',
+      's1-title':'Exporter vos données depuis Snapchat',
+      's1-p1':'Connectez-vous à votre compte Snapchat (téléphone ou PC) et rendez-vous sur la page <strong>Mes données</strong> :',
+      's1-snaplink':'Ouvrir « Mes données » sur Snapchat',
+      's1-p2':'Puis allez dans <strong>Paramètres → Mes données</strong> et cochez ces deux cases :',
+      's1-li1':'Exporter mes Souvenirs','s1-li2':'Exporter des fichiers JSON',
+      's1-warn':'Les fichiers JSON sont indispensables pour restaurer les métadonnées. Sans eux, l\'outil ne peut pas fonctionner.',
+      's1-p3':'Choisissez la plage de dates souhaitée, puis patientez. Snapchat vous enverra un e-mail quand l\'export sera prêt.',
+      's2-title':'Télécharger les archives ZIP',
+      's2-p1':'Sur la même page <strong>Mes données</strong>, dépliez la section <em>« Vos exports »</em>. Vous verrez plusieurs archives ZIP.',
+      's2-info':'Téléchargez <strong>toutes</strong> les archives ZIP, pas seulement la première. Elles peuvent être réparties si vous avez beaucoup de souvenirs.',
+      's3-title':'Organiser les fichiers',
+      's3-p1':'Placez tous les fichiers ZIP dans un même dossier. Les archives peuvent porter n\'importe quel nom et se trouver n\'importe où sur votre système.',
+      's3-eg':'Exemple de structure',
+      's4-title':'Vérifier les prérequis',
+      's4-p1':'Avant de lancer le traitement, assurez-vous que FFmpeg est bien installé :',
+      's4-verify':'Vérification',
+      's4-p2':'Sur macOS et Linux, rendez aussi l\'exécutable <code>smp</code> exécutable :',
+      's4-tip':'Sur Windows, aucune étape supplémentaire n\'est nécessaire : double-cliquez sur le <code>.exe</code> ou lancez-le depuis un terminal.',
+      's5-title':'Lancer le traitement',
+      's5-p1':'Ouvrez un terminal dans le dossier contenant l\'exécutable <code>smp</code>, puis lancez :',
+      's5-p2':'Sur macOS/Linux, si <code>smp</code> n\'est pas dans le PATH :',
+      's5-p3':'Une barre de progression s\'affiche. Patientez jusqu\'à la fin.',
+      's6-title':'Récupérer les fichiers traités',
+      's6-p1':'Les médias sont enregistrés dans le dossier <code>output/</code> créé automatiquement à côté de l\'exécutable.',
+      's6-result':'Résultat attendu','s6-output':'Fichiers générés',
+      's6-info':'En cas d\'erreurs, un fichier <code>output/errors.log</code> est généré automatiquement avec les détails de chaque échec.',
+      'install-title':'Installation','install-sub':'Téléchargez l\'exécutable et installez les dépendances requises.',
+      'win-desc':'Windows 10/11 — 64 bits (x64)',
+      'all-releases':'Voir toutes les releases (autres architectures) →',
+      'no-install':'Aucune installation requise : placez l\'exécutable où vous voulez et lancez-le depuis un terminal.',
+      'required':'Requis','optional':'Optionnel — GPS',
+      'ffmpeg-desc':'Nécessaire pour traiter les vidéos et les overlays. Sans FFmpeg, l\'outil ne peut pas fonctionner.',
+      'winget-warn':'Si <code>winget</code> n\'est pas reconnu, installez <strong>App Installer</strong> depuis le Microsoft Store.',
+      'verify-install':'Vérifiez l\'installation :','verification':'Vérification',
+      'exif-desc':'Nécessaire uniquement pour conserver les données GPS dans vos médias (flag <code>--gps</code>).',
+      'builder-title':'Générateur de commande','builder-sub':'Configurez les options et copiez la commande prête à l\'emploi.',
+      'options':'Options','builder-desc':'Remplissez les champs pour personnaliser votre commande.',
+      'input-label':'Dossier des archives ZIP','input-hint':'Chemin vers le dossier contenant vos fichiers .zip Snapchat.',
+      'workers-label':'Nombre de workers parallèles (<code>-w</code>)',
+      'workers-hint':'Contrôle combien de fichiers sont traités simultanément. Laissez vide pour la valeur par défaut.',
+      'extra-options':'Options supplémentaires',
+      'gps-label':'Conserver les données GPS',
+      'gps-hint':'Ajoute le flag <code>--gps</code>. Nécessite ExifTool installé.',
+      'generated-cmd':'Commande générée',
+      'ref-title':'Référence complète','ref-desc':'Toutes les options disponibles pour <code>smp process</code>.',
+      'ref-i':'Dossier contenant les archives ZIP','ref-w':'Nombre de workers parallèles','ref-gps':'Écrire les coordonnées GPS',
+      'faq-title':'Questions fréquentes','faq-sub':'Les réponses aux problèmes les plus courants.',
+      'faq1-q':'Pourquoi dois-je cocher « Exporter les fichiers JSON » ?',
+      'faq1-a':'Les fichiers JSON contiennent les métadonnées de chaque souvenir : date, heure, localisation GPS et informations sur l\'overlay. Sans ces fichiers, l\'outil n\'a aucun moyen de savoir quels overlays appliquer ni comment horodater vos médias.',
+      'faq2-q':'Le traitement est-il lent ? Comment l\'accélérer ?',
+      'faq2-a':'La durée dépend du nombre de médias et de votre machine. Augmentez le nombre de workers avec <code>-w</code> (ex : <code>-w 8</code>) pour traiter plus de fichiers en parallèle. La valeur par défaut est généralement suffisante.',
+      'faq3-q':'Que se passe-t-il si certains fichiers échouent ?',
+      'faq3-a':'Un fichier <code>output/errors.log</code> est créé automatiquement avec les détails de chaque échec. Les fichiers traités avec succès sont disponibles normalement dans <code>output/</code>.',
+      'faq4-q':'Mes données restent-elles privées ?',
+      'faq4-a':'Oui. L\'outil fonctionne entièrement en local sur votre machine. Aucune donnée n\'est envoyée vers des serveurs distants. Vos souvenirs ne quittent jamais votre ordinateur.',
+      'faq5-q':'J\'ai l\'erreur « smp : command not found » — que faire ?',
+      'faq5-a':'Lancez le terminal dans le dossier où se trouve l\'exécutable <code>smp</code>. Sous Linux/macOS, rendez-le exécutable avec <code>chmod +x smp</code> puis appelez-le avec <code>./smp process -i ./exports</code>.',
+      'faq6-q':'Le flag --gps est activé mais les coordonnées n\'apparaissent pas',
+      'faq6-a':'Vérifiez qu\'ExifTool est installé avec <code>exiftool -ver</code>. Notez aussi que tous les souvenirs ne contiennent pas de données GPS — seuls ceux enregistrés avec la localisation active en auront.',
+      'faq7-q':'Puis-je contribuer au projet ?',
+      'faq7-a':'Absolument ! Le projet est open source sous licence MIT. Forkez le dépôt et ouvrez une Pull Request sur ',
+      'copy':'Copier',
+    },
+    en: {
+      skip:'Skip to main content',
+      'h1':'Snap Memories<br><span>Processor</span>',
+      'hero-sub':'Recover your exported Snapchat memories with overlays, timestamps, and locations — in a few commands.',
+      'tab-guide':'Guide','tab-install':'Installation','tab-builder':'Command',
+      'guide-title':'How does it work?','guide-sub':'Follow these steps to recover your complete Snapchat memories.',
+      's1-title':'Export your data from Snapchat',
+      's1-p1':'Log in to your Snapchat account (phone or PC) and go to the <strong>My Data</strong> page:',
+      's1-snaplink':'Open "My Data" on Snapchat',
+      's1-p2':'Then go to <strong>Settings → My Data</strong> and check both boxes:',
+      's1-li1':'Export My Memories','s1-li2':'Export JSON Files',
+      's1-warn':'JSON files are essential to restore metadata. Without them, the tool cannot work.',
+      's1-p3':'Choose your desired date range and wait. Snapchat will send you an email when the export is ready.',
+      's2-title':'Download the ZIP archives',
+      's2-p1':'On the same <strong>My Data</strong> page, expand the <em>"Your exports"</em> section. You will see several ZIP archives.',
+      's2-info':'Download <strong>all</strong> ZIP archives, not just the first one. They may be split if you have many memories.',
+      's3-title':'Organize the files',
+      's3-p1':'Place all ZIP files in the same folder. Archives can have any name and be stored anywhere on your system.',
+      's3-eg':'Folder structure example',
+      's4-title':'Check prerequisites',
+      's4-p1':'Before running the tool, make sure FFmpeg is installed:',
+      's4-verify':'Verify',
+      's4-p2':'On macOS and Linux, also make the <code>smp</code> binary executable:',
+      's4-tip':'On Windows, no extra step is needed: double-click the <code>.exe</code> or run it from a terminal.',
+      's5-title':'Run the processor',
+      's5-p1':'Open a terminal in the folder containing the <code>smp</code> binary, then run:',
+      's5-p2':'On macOS/Linux, if <code>smp</code> is not in your PATH:',
+      's5-p3':'A progress bar will appear. Wait for it to finish.',
+      's6-title':'Retrieve processed files',
+      's6-p1':'Processed media is saved in the <code>output/</code> folder created automatically next to the binary.',
+      's6-result':'Expected terminal output','s6-output':'Generated files',
+      's6-info':'If errors occur, an <code>output/errors.log</code> file is generated automatically with details of each failure.',
+      'install-title':'Installation','install-sub':'Download the binary and install the required dependencies.',
+      'win-desc':'Windows 10/11 — 64-bit (x64)',
+      'all-releases':'See all releases (other architectures) →',
+      'no-install':'No installation required: place the binary wherever you want and run it from a terminal.',
+      'required':'Required','optional':'Optional — GPS',
+      'ffmpeg-desc':'Required to process videos and overlays. Without FFmpeg, the tool cannot work.',
+      'winget-warn':'If <code>winget</code> is not recognized, install <strong>App Installer</strong> from the Microsoft Store.',
+      'verify-install':'Verify the installation:','verification':'Verification',
+      'exif-desc':'Only needed if you want to preserve GPS data in your media (using the <code>--gps</code> flag).',
+      'builder-title':'Command builder','builder-sub':'Configure options and copy the ready-to-use command.',
+      'options':'Options','builder-desc':'Fill in the fields to customize your command.',
+      'input-label':'ZIP archives folder','input-hint':'Path to the folder containing your Snapchat .zip files.',
+      'workers-label':'Number of parallel workers (<code>-w</code>)',
+      'workers-hint':'Controls how many files are processed simultaneously. Leave empty to use the default.',
+      'extra-options':'Additional options',
+      'gps-label':'Preserve GPS data',
+      'gps-hint':'Adds the <code>--gps</code> flag. Requires ExifTool to be installed.',
+      'generated-cmd':'Generated command',
+      'ref-title':'Full reference','ref-desc':'All available options for <code>smp process</code>.',
+      'ref-i':'Folder containing ZIP archives','ref-w':'Number of parallel workers','ref-gps':'Write GPS coordinates',
+      'faq-title':'Frequently asked questions','faq-sub':'Answers to the most common issues.',
+      'faq1-q':'Why do I need to check "Export JSON Files"?',
+      'faq1-a':'JSON files contain each memory\'s metadata: date, time, GPS location, and overlay information. Without them, the tool has no way to know which overlays to apply or how to timestamp your media.',
+      'faq2-q':'Is processing slow? How can I speed it up?',
+      'faq2-a':'Duration depends on the number of media files and your hardware. Increase the worker count with <code>-w</code> (e.g. <code>-w 8</code>) to process more files in parallel. The default value is usually sufficient.',
+      'faq3-q':'What happens if some files fail?',
+      'faq3-a':'An <code>output/errors.log</code> file is automatically created with details of each failure. Successfully processed files are available normally in <code>output/</code>.',
+      'faq4-q':'Does my data stay private?',
+      'faq4-a':'Yes. The tool runs entirely locally on your machine. No data is sent to remote servers. Your memories never leave your computer.',
+      'faq5-q':'I get "smp: command not found" — what should I do?',
+      'faq5-a':'Run the terminal from the folder where the <code>smp</code> binary is located. On Linux/macOS, make it executable with <code>chmod +x smp</code> then call it with <code>./smp process -i ./exports</code>.',
+      'faq6-q':'The --gps flag is set but coordinates don\'t appear',
+      'faq6-a':'Check that ExifTool is installed by running <code>exiftool -ver</code>. Also note that not all Snapchat memories contain GPS data — only those recorded with location enabled will have it.',
+      'faq7-q':'Can I contribute to the project?',
+      'faq7-a':'Absolutely! The project is open source under the MIT license. Fork the repo and open a Pull Request on ',
+      'copy':'Copy',
+    }
+  };
+
+  let currentLang = 'fr';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    const t = LANG[lang];
+    document.documentElement.lang = lang;
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.innerHTML = t[key];
+    });
+
+    /* mise à jour du libellé du bouton de langue */
+    const lb = document.getElementById('lang-btn');
+    lb.textContent = lang === 'fr' ? '🌐 EN' : '🌐 FR';
+    lb.setAttribute('aria-label', lang === 'fr' ? 'Switch to English' : 'Passer en français');
+
+    /* mise à jour du texte "Copié" sur les boutons déjà actifs */
+    document.querySelectorAll('.copy-btn.copied').forEach(b => {
+      b.querySelector('span:last-child').textContent = lang === 'fr' ? 'Copié !' : 'Copied!';
+    });
+  }
+
+  function toggleLang() {
+    applyLang(currentLang === 'fr' ? 'en' : 'fr');
+  }
+
+  /* basculement du thème jour / nuit */
+  let isDark = true;
+  function toggleTheme() {
+    isDark = !isDark;
+    document.body.classList.toggle('light', !isDark);
+    const btn = document.getElementById('theme-btn');
+    if (isDark) {
+      btn.textContent = '☀️ ' + (currentLang === 'fr' ? 'Jour' : 'Day');
+      btn.setAttribute('aria-label', currentLang === 'fr' ? 'Passer en mode jour' : 'Switch to day mode');
+    } else {
+      btn.textContent = '🌙 ' + (currentLang === 'fr' ? 'Nuit' : 'Night');
+      btn.setAttribute('aria-label', currentLang === 'fr' ? 'Passer en mode nuit' : 'Switch to night mode');
+    }
+  }
+
+  /* gestion des onglets principaux (Guide, Installation, Commande, FAQ) */
+  function switchTab(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.setAttribute('aria-selected','false'));
+    document.getElementById('panel-'+id).classList.add('active');
+    const btn = document.getElementById('tab-'+id);
+    btn.setAttribute('aria-selected','true');
+    btn.focus();
+  }
+
+  function switchOS(group, os, clickedBtn) {
+    const parent = clickedBtn.closest('.os-tabs');
+    parent.querySelectorAll('.os-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    parent.querySelectorAll('.os-content').forEach(c => c.classList.remove('active'));
+    clickedBtn.classList.add('active');
+    clickedBtn.setAttribute('aria-selected','true');
+    const target = parent.querySelector('#'+group+'-'+os);
+    if (target) target.classList.add('active');
+  }
+
+  /* copie dans le presse-papier avec retour visuel temporaire */
+  function copyCode(btn, text) {
+    const copiedLabel = currentLang === 'fr' ? 'Copié !' : 'Copied!';
+    navigator.clipboard.writeText(text).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span aria-hidden="true">✅</span> '+copiedLabel;
+      btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+    });
+  }
+
+  /* construction dynamique de la commande selon les options du formulaire */
+  function buildCommand() {
+    const dir = document.getElementById('input-dir').value.trim() || './exports';
+    const w = document.getElementById('workers').value.trim();
+    const gps = document.getElementById('opt-gps').checked;
+    let cmd = 'smp process -i ' + dir;
+    if (w && parseInt(w) > 0) cmd += ' -w ' + w;
+    if (gps) cmd += ' --gps';
+    document.getElementById('cmd-display').textContent = cmd;
+  }
+
+  function copyBuiltCommand() {
+    copyCode(document.getElementById('copy-built-btn'), document.getElementById('cmd-display').textContent);
+  }
+
+  /* navigation au clavier dans les groupes d'onglets (flèches gauche/droite) */
+  document.querySelectorAll('[role="tablist"]').forEach(list => {
+    list.addEventListener('keydown', e => {
+      const tabs = [...list.querySelectorAll('[role="tab"]')];
+      const idx = tabs.indexOf(document.activeElement);
+      if (idx === -1) return;
+      if (e.key==='ArrowRight'||e.key==='ArrowDown') { e.preventDefault(); tabs[(idx+1)%tabs.length].click(); }
+      else if (e.key==='ArrowLeft'||e.key==='ArrowUp') { e.preventDefault(); tabs[(idx-1+tabs.length)%tabs.length].click(); }
+    });
+  });
+</script>
+</body>
+</html>
