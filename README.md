@@ -56,6 +56,9 @@ The easiest and fastest way to install it is running this command in a command l
 winget install ffmpeg
 ```
 
+> [!WARNING]
+> If winget is not recognize as a command, don't panic and install it via the **Microsoft Store**. Just search for "App Installer".
+
 #### macOS
 
 ```bash
@@ -92,7 +95,11 @@ If you want to preserve location data, install ExifTool and use the `--gps` flag
 
 ### Windows
 
-Download ExifTool from the official website and add it to your PATH.
+Again, the easiest way is to install it via `winget`, running this command:
+
+```
+winget install -e --id OliverBetz.ExifTool
+```
 
 ### macOS
 
@@ -124,7 +131,7 @@ exiftool -ver
 
 ## Preparing Your Export
 
-Place all Snapchat export ZIP files in a directory.
+Place all Snapchat export `ZIP` files in a directory.
 
 Example:
 
@@ -136,13 +143,14 @@ exports/
 └── mydata-4.zip
 ```
 
-The archives may be stored anywhere on your system.
+> [!NOTE]
+> The archives may be stored anywhere on your system.
 
 ---
 
 ## Usage
 
-### Command Line 
+### Command Line (inside a terminal) 
 
 #### Basic Usage
 
@@ -158,7 +166,8 @@ The `-i` flag specifies the directory containing your Snapchat export archives.
 smp process -i ./exports --gps
 ```
 
-This requires ExifTool to be installed.
+> [!NOTE]
+> This requires ExifTool to be installed.
 
 #### Custom Worker Count
 
@@ -168,7 +177,8 @@ smp process -i ./exports -w 8
 
 The worker count controls how many files are processed simultaneously.
 
-In most cases, the default value is sufficient.
+> [!TIP]
+> In most cases, the default value is sufficient.
 
 ---
 
@@ -215,3 +225,7 @@ This file contains detailed information about each failure and can be useful for
 ## License
 
 This project is under MIT License
+
+## Contributing
+
+Want to make this tool better ? Don't hesistate to fork it and open a PR. I'll be happy to read it :)
