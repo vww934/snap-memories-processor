@@ -12,9 +12,9 @@ Snapchat exporte les Memories sous forme de fichiers multimédias bruts accompag
 
 Commencez par vous connecter à votre compte Snapchat (sur téléphone ou ordinateur), puis rendez-vous dans `Paramètres` -> `Mes données`.
 
-Vous devez ensuite cocher `Exporter vos Memories` **ET** `Exporter les fichiers JSON`.
+Vous devez ensuite cocher `Exporter mes souvenirs` **ET** `Exporter des fichiers JSON`.
 
-![sélection des éléments à exporter](./assets/snap_exports_options.png)
+![sélection des éléments à exporter](./assets/snap_exports_options_fr.png)
 
 Vous serez ensuite invité à choisir la période à exporter. Ce choix dépend entièrement de vos besoins.
 
@@ -22,7 +22,7 @@ Selon la taille de l'export, vous devriez recevoir assez rapidement un e-mail de
 
 Vous pourrez alors retourner sur la même page et ouvrir la section `Vos exports`. Vous devriez voir quelque chose de similaire à ceci :
 
-![téléchargement des exports](./assets/snap_exports_download.png)
+![téléchargement des exports](./assets/snap_exports_download_fr.png)
 
 Téléchargez **toutes** les archives `zip` et vous serez prêt à commencer.
 
