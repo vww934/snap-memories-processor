@@ -1,0 +1,270 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>JupyterHub</title>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+      <link rel="stylesheet"
+            href="/jupyter/hub/static/css/style.min.css?v=de37c927476e635f657bafc35a5e1ae9c0f3ce691c5779b0d3be84fa5e2ec3813214270a51f83fc93b945e5d7e418046af1e370e9538ea8a44d49d472ee7dffe"
+            type="text/css" />
+    
+    
+      <link rel="icon" href="/jupyter/hub/static/favicon.ico?v=fde5757cd3892b979919d3b1faa88a410f28829feb5ba22b6cf069f2c6c98675fceef90f932e49b510e74d65c681d5846b943e7f7cc1b41867422f0481085c1f" type="image/x-icon">
+    
+    
+      <script src="/jupyter/hub/static/components/bootstrap/dist/js/bootstrap.bundle.min.js?v=ecf8bfa2d7656db091f8b9d6f85ecfc057120c93ae5090773b1b441db838bd232fcef26375ee0fa35bf8051f4675cf5a5cd50d155518f922b9d70593f161741a" type="text/javascript" charset="utf-8"></script>
+      <script src="/jupyter/hub/static/components/requirejs/require.js?v=1ff44af658602d913b22fca97c78f98945f47e76dacf9800f32f35350f05e9acda6dc710b8501579076f3980de02f02c97f5994ce1a9864c21865a42262d79ec" type="text/javascript" charset="utf-8"></script>
+      <script src="/jupyter/hub/static/components/jquery/dist/jquery.min.js?v=bf6089ed4698cb8270a8b0c8ad9508ff886a7a842278e98064d5c1790ca3a36d5d69d9f047ef196882554fc104da2c88eb5395f1ee8cf0f3f6ff8869408350fe" type="text/javascript" charset="utf-8"></script>
+      <script src="/jupyter/hub/static/js/darkmode.js?v=2fd9a7d11ad78df9351fed40ab35eab52e1e6a3d516f188b652120e6faf57b8e387a30aae8f52a6fb51563d06d04545c7005da0b77a98c21b0bd28f6d1cdfa11" type="text/javascript" charset="utf-8"></script>
+    
+    
+    
+    <script type="text/javascript">
+      require.config({
+        
+        urlArgs: "v=20260521065008",
+        
+        baseUrl: '/jupyter/hub/static/js',
+        paths: {
+          components: '../components',
+          jquery: '../components/jquery/dist/jquery.min',
+          moment: "../components/moment/moment",
+        },
+      });
+
+      window.jhdata = {
+        base_url: "/jupyter/hub/",
+        prefix: "/jupyter/",
+        
+        
+        admin_access: false,
+        
+        
+        options_form: false,
+        
+        xsrf_token: "MnwxOjB8MTA6MTc4MTY0MDgwOHw1Ol94c3JmfDY4OlRtOXVaVHBzZG0xZmJFWkZRM050WVZkUlRsSTBlbVJpT1hkSVZUVnZUbWRWZUZWMFQyUkVXRE50TFcxUFRVUk5QUT09fGI3MTQ1OTMwNzEzNmQ5NTQ5YjgzOGM2YThkYmQxN2E3YjAzZDM4OGQ0MDk2ODAzZmU1MTUxYmJjY2U0YmYzNWY",
+      };
+
+</script>
+    
+    
+      <meta name="description" content="JupyterHub">
+      <meta name="keywords" content="Jupyter, JupyterHub">
+    
+  </head>
+  <body>
+    <noscript>
+      <div id='noscript'>
+        JupyterHub requires JavaScript.
+        <br>
+        Please enable it to proceed.
+      </div>
+    </noscript>
+    
+      <nav class="navbar navbar-expand-sm bg-body-tertiary mb-4">
+        <div class="container-fluid">
+          
+            <span id="jupyterhub-logo" class="navbar-brand">
+              <a href="/jupyter/hub/">
+                <img src='/jupyter/hub/logo'
+                     alt='JupyterHub logo'
+                     class='jpy-logo'
+                     title='Home' />
+              </a>
+            </span>
+          
+          
+          <div class="collapse navbar-collapse" id="thenavbar">
+            <ul class="navbar-nav me-auto mb-0">
+              
+            </ul>
+            <ul class="nav navbar-nav me-2">
+              
+                <li class="nav-item">
+                  
+                    <button class="btn btn-sm"
+                            id="dark-theme-toggle"
+                            aria-label="Toggle dark mode"
+                            title="Toggle dark mode">
+                      <i aria-hidden="true" class="fa fa-circle-half-stroke"></i>
+                    </button>
+                  
+                </li>
+                <li class="nav-item">
+                  
+
+                </li>
+              
+            </ul>
+          </div>
+          
+          
+        </div>
+      </nav>
+    
+    
+      
+    
+    
+  
+  <nav>
+  <div class="dropdown">
+    <button class="dropbtn">Menu ▼</button>
+    <div class="dropdown-content">
+      <a href="http://192.168.116.41:5000/M1">Emargement M1</a>
+      <a href="http://192.168.116.41:5000/M2">Emargement M2</a>
+      <a href="/contact">OpenRegex</a>
+    </div>
+  </div>
+</nav>
+
+<style>
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+  background-color: #FFA500;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 8px;
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+</style>
+
+    <div id="login-main" class="container">
+      
+        
+          <form action="/jupyter/hub/login?next=%2Fjupyter%2Fhub%2Fapi%2Foauth2%2Fauthorize%3Fclient_id%3Djupyterhub-user-asmakhat%26redirect_uri%3D%252Fjupyter%252Fuser%252Fasmakhat%252Foauth_callback%26response_type%3Dcode%26state%3DuNMjr73BHEGqOINVaTIifA"
+                method="post"
+                role="form">
+            <div class="auth-form-header" style="display:flex; justify-content:space-between; align-items:center; ">
+		    <h1>Accès</h1>
+		    <img height="200px" src="/jupyter/hub/static/images/logoTilde.png"  style="height:150px;"/>
+            </div>
+            <div class='auth-form-body m-auto'>
+              <p id='insecure-login-warning' class='hidden'>
+                Warning: JupyterHub seems to be served over an unsecured HTTP connection.
+                We strongly recommend enabling HTTPS for JupyterHub.
+              </p>
+              
+              <input type="hidden" name="_xsrf" value="MnwxOjB8MTA6MTc4MTY0MDgwOHw1Ol94c3JmfDY4OlRtOXVaVHBzZG0xZmJFWkZRM050WVZkUlRsSTBlbVJpT1hkSVZUVnZUbWRWZUZWMFQyUkVXRE50TFcxUFRVUk5QUT09fGI3MTQ1OTMwNzEzNmQ5NTQ5YjgzOGM2YThkYmQxN2E3YjAzZDM4OGQ0MDk2ODAzZmU1MTUxYmJjY2U0YmYzNWY" />
+              <label for="username_input">Username:</label>
+              <input id="username_input"
+                     type="text"
+                     autocapitalize="off"
+                     autocorrect="off"
+                     autocomplete="username"
+                     class="form-control"
+                     name="username"
+                     val=""
+                     autofocus="autofocus" />
+              <label for='password_input'>Password:</label>
+              <input type="password"
+                     class="form-control"
+                     autocomplete="current-password"
+                     name="password"
+                     id="password_input" />
+              
+              <div class="feedback-container">
+                <input id="login_submit"
+                       type="submit"
+                       class='btn btn-jupyter form-control'
+                       value='Sign in'
+                       tabindex="3" />
+                <div class="feedback-widget hidden">
+                  <i class="fa fa-spinner"></i>
+                </div>
+              </div>
+              
+                
+              
+            </div>
+          </form>
+        
+      
+      <center><a href="http://192.168.116.41:5000/M1">Émargement M1</a>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://192.168.116.41:5000/M2">Émargement M2</a></center>
+    </div>
+  
+
+    
+    
+    
+  
+  
+  <div class="modal fade"
+       id="error-dialog"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="error-label"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="error-label">Error</h2>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+      <div class="ajax-error alert-danger">The error</div>
+    </div>
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-primary"
+                  data-bs-dismiss="modal"
+                  data-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    
+  
+    
+  <script>
+    if (!window.isSecureContext) {
+      // unhide http warning
+      var warning = document.getElementById('insecure-login-warning');
+      warning.className = warning.className.replace(/\bhidden\b/, '');
+    }
+    // setup onSubmit feedback
+    $('form').submit((e) => {
+      var form = $(e.target);
+      form.find('.feedback-container>input').attr('disabled', true);
+      form.find('.feedback-container>*').toggleClass('hidden');
+      form.find('.feedback-widget>*').toggleClass('fa-pulse');
+    });
+  </script>
+
+  </body>
+</html>
